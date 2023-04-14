@@ -1,0 +1,34 @@
+Q.Find the email activity rank for each user. Email activity rank is defined by the total number of emails sent. The user with the highest number of emails sent will have a rank of 1, and so on. Output the user, total emails, and their activity rank. Order records by the total emails in descending order. Sort users with the same number of emails in alphabetical order.
+In your rankings, return a unique value (i.e., a unique rank) even if multiple users have the same number of emails.
+
+select from_user,count(from_user) as total_mails,row_number() over( order by count(from_user) desc,from_user asc)as activity_rank from google_gmail_emails
+group by from_user
+ 
+;
+
+Q.Find the number of emails received by each user under each built-in email label. The email labels are: 'Promotion', 'Social', and 'Shopping'. Output the user along with the number of promotion, social, and shopping mails count,.
+
+
+
+
+
+select to_user,sum(case when lower(label)='promotion' then 1 else 0 end)as Promotion_cnt,sum(case when lower(label)='social' then 1 else 0 end)as Social_cnt,
+sum(case when lower(label)='shopping' then 1 else 0 end)as Shopping_cnt
+
+from
+google_gmail_emails left join google_gmail_labels
+on email_id=id
+group by to_user
+;
+
+Q.Find the customer with the highest daily total order cost between 2019-02-01 to 2019-05-01. If customer had more than one order on a certain day, sum the order costs on daily basis. Output customer's first name, total cost of their items, and the date.
+
+
+For simplicity, you can assume that every first name in the dataset is unique.
+select c.first_name,sum(o.total_order_cost),o.order_date from customers c left join orders o on
+o.cust_id=c.id
+where o.order_date between '2019-02-01' and '2019-05-01'
+group by c.first_name,o.order_date
+order by sum(o.total_order_cost) desc
+limit 1
+;
